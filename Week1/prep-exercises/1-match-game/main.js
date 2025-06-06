@@ -12,31 +12,55 @@ const WINNER_PLAYER_CLASS = 'winner'
 
 const amountStartStick = 20
 let amountStick = amountStartStick
+let currentPlayerId = PLAYER_ONE_ID //add the first player as the current one
+
 
 const displayNSticks = amount => {
+  const stickContainer = document.getElementById(STICKS_ID)
+  stickContainer.innerHTML = '' // Clear before redrawing
   for (let i = 0; i < amount; i++) {
     const stick = document.createElement('span');
     stick.className = 'stick';
-    document.getElementById(STICKS_ID).appendChild(stick);
+    stickContainer.appendChild(stick);
   }
 }
 
 const updateToTheNextPlayer = () => {
-    // @TODO MAKE ME
-    // Update the amount of sticks displayed to the players
-    // Tell who is the next player or if anyone won, end the game (hint: you can call endTheGame function)
+  displayNSticks(amountStick);
+  if (amountStick <= 0) {
+    const winnerPlayerId = currentPlayerId === PLAYER_ONE_ID ? PLAYER_TWO_ID : PLAYER_ONE_ID;
+    endTheGame(winnerPlayerId);
+return
+
+
+}
+currentPlayerId = currentPlayerId === PLAYER_ONE_ID ? PLAYER_TWO_ID : PLAYER_ONE_ID;
+  document.getElementById(PLAYER_ONE_ID).classList.toggle(ACTIVE_PLAYER_CLASS);
+  document.getElementById(PLAYER_TWO_ID).classList.toggle(ACTIVE_PLAYER_CLASS);
 }
 
 const endTheGame = winnerPlayerId => {
-    // @TODO MAKE ME
-    // Show the winner
-    // Make sure players can not try to remove sticks anymore
+  document.getElementById(PLAYER_ONE_ID).classList.remove(ACTIVE_PLAYER_CLASS);
+  document.getElementById(PLAYER_TWO_ID).classList.remove(ACTIVE_PLAYER_CLASS);
+  document.getElementById(winnerPlayerId).classList.add(WINNER_PLAYER_CLASS);
+
+  document.getElementById(BUTTON_ONE_ID).disabled = true;
+  document.getElementById(BUTTON_TWO_ID).disabled = true;
+  document.getElementById(BUTTON_THREE_ID).disabled = true;
+
+    const winnerName = document.getElementById(winnerPlayerId).textContent;
+  alert(`It's unbelievable, but the winner is Igor ${winnerName}!`);
+}
+const handleClick = number => {
+  if (amountStick <= 0 || number > amountStick) return
+  amountStick -= number
+  updateToTheNextPlayer()
 }
 
-// @TODO MAKE ME
-// React to click on buttons
-// On a click, remove the amount of sticks displayed by the button
-// Update the game for the next player (hint: you can call updateToTheNextPlayer function)
+document.getElementById(BUTTON_ONE_ID).addEventListener('click', () => handleClick(1))
+document.getElementById(BUTTON_TWO_ID).addEventListener('click', () => handleClick(2))
+document.getElementById(BUTTON_THREE_ID).addEventListener('click', () => handleClick(3))
+
 
 // ========== Start the game
 // Display the start sticks
@@ -44,3 +68,22 @@ displayNSticks(amountStartStick)
 
 // Set the first player as the active one
 document.getElementById(PLAYER_ONE_ID).classList.toggle(ACTIVE_PLAYER_CLASS)
+
+const resetGame = () => {
+  
+  amountStick = amountStartStick;
+  currentPlayerId = PLAYER_ONE_ID; // Reset to the first player
+  document.getElementById(PLAYER_ONE_ID).classList.add(ACTIVE_PLAYER_CLASS);
+  document.getElementById(PLAYER_TWO_ID).classList.remove(ACTIVE_PLAYER_CLASS);
+  
+  document.getElementById(BUTTON_ONE_ID).disabled = false;
+  document.getElementById(BUTTON_TWO_ID).disabled = false;
+  document.getElementById(BUTTON_THREE_ID).disabled = false;
+
+  displayNSticks(amountStick);
+  
+  // Remove winner class if it was set
+  document.getElementById(PLAYER_ONE_ID).classList.remove(WINNER_PLAYER_CLASS);
+  document.getElementById(PLAYER_TWO_ID).classList.remove(WINNER_PLAYER_CLASS);
+}
+document.getElementById('new_game').addEventListener('click', resetGame);
